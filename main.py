@@ -214,7 +214,7 @@ class MainWindow(QMainWindow):
         self.btn_apply = QPushButton("Normalize loudness")
         self.btn_apply.clicked.connect(self.apply)
         self.btn_apply.setEnabled(False)
-        self.btn_apply.setStyleSheet("QPushButton { background: #2d6a2d; } QPushButton:hover { background: #3a8a3a; }")
+        self.btn_apply.setStyleSheet("QPushButton { background: #2d6a2d; color: white; } QPushButton:hover { background: #3a8a3a; color: white; }")
 
         self.chk_backup = QCheckBox("Backup originals")
         self.chk_backup.setChecked(True)

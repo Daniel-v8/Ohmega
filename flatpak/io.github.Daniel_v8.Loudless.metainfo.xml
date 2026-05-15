@@ -52,6 +52,29 @@
     <keyword>lufs</keyword>
   </keywords>
 
+  <screenshots>
+    <screenshot type="default">
+      <caption>Files loaded and ready to scan</caption>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Loudless/main/screenshots/02-files-loaded.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Scanning loudness levels</caption>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Loudless/main/screenshots/03-scanning.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Normalizing audio directly in files</caption>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Loudless/main/screenshots/04-normalizing.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Done — gain applied and displayed per file</caption>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Loudless/main/screenshots/05-done.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Main window</caption>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Loudless/main/screenshots/01-empty.png</image>
+    </screenshot>
+  </screenshots>
+
   <releases>
     <release version="1.0.0" date="2026-05-15">
       <description>
