@@ -104,7 +104,7 @@ class ScanWorker(QThread):
 
 def backup_file(filepath: str) -> str:
     p = Path(filepath)
-    backup_dir = p.parent.parent / f"{p.parent.name} (Loudless backup)"
+    backup_dir = p.parent / "Loudless Backup"
     backup_dir.mkdir(exist_ok=True)
     dest = backup_dir / p.name
     if not dest.exists():
@@ -218,7 +218,7 @@ class MainWindow(QMainWindow):
 
         self.chk_backup = QCheckBox("Backup originals")
         self.chk_backup.setChecked(True)
-        self.chk_backup.setToolTip("Copies originals to '[folder] (Loudless backup)' before modifying")
+        self.chk_backup.setToolTip("Copies originals to 'Loudless Backup/' subfolder before modifying")
 
         for w in [self.btn_add, self.btn_clear, self.target_combo, self.btn_scan, self.chk_backup, self.btn_apply]:
             ctrl.addWidget(w)
