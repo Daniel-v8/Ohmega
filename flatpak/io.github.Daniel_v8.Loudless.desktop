@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Loudless
+GenericName=Audio Loudness Normalizer
+Comment=Normalize audio loudness for FLAC, MP3, WAV and more
+Exec=loudless
+Icon=io.github.Daniel_v8.Loudless
+Categories=Audio;AudioVideo;Utility;
+Keywords=audio;loudness;normalize;flac;mp3;replaygain;volume;
+StartupNotify=true
+Terminal=false

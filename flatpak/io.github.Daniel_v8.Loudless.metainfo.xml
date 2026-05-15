@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.Daniel_v8.Loudless</id>
+  <name>Loudless</name>
+  <summary>Normalize audio loudness directly in your files</summary>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+
+  <description>
+    <p>
+      Loudless normalizes the loudness of your audio files using the EBU R128 standard.
+      Unlike ReplayGain tags, Loudless writes the gain directly into the audio data —
+      so your files play at the correct volume in every player without any configuration.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Drag and drop files or entire folders</li>
+      <li>Supports FLAC, WAV, MP3, OGG, OPUS, M4A, AAC, WMA, APE, WavPack</li>
+      <li>Lossless processing for FLAC, WAV, AIFF, APE and WavPack</li>
+      <li>Automatic backup of originals before modifying</li>
+      <li>Three loudness targets: Streaming (−14 LUFS), ReplayGain (−18 LUFS), CD/Mastering (−23 LUFS)</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.Daniel_v8.Loudless.desktop</launchable>
+
+  <url type="homepage">https://github.com/Daniel-v8/Loudless</url>
+  <url type="bugtracker">https://github.com/Daniel-v8/Loudless/issues</url>
+
+  <developer id="io.github.Daniel-v8">
+    <name>Daniel-v8</name>
+  </developer>
+
+  <provides>
+    <binary>loudless</binary>
+  </provides>
+
+  <categories>
+    <category>Audio</category>
+    <category>AudioVideo</category>
+    <category>Utility</category>
+  </categories>
+
+  <keywords>
+    <keyword>audio</keyword>
+    <keyword>loudness</keyword>
+    <keyword>normalize</keyword>
+    <keyword>flac</keyword>
+    <keyword>mp3</keyword>
+    <keyword>replaygain</keyword>
+    <keyword>volume</keyword>
+    <keyword>lufs</keyword>
+  </keywords>
+
+  <releases>
+    <release version="1.0.0" date="2026-05-15">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1"/>
+</component>
