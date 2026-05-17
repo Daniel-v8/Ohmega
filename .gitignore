@@ -1,4 +1,7 @@
+flatpak-build/
+.flatpak-builder/
 __pycache__/
-*.py[cod]
-*.loudless_tmp.*
-.DS_Store
+*.pyc
+*.pyo
+repo/
+flathub/

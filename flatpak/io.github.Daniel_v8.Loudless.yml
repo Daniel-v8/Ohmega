@@ -75,4 +75,4 @@ modules:
       - type: git
         url: https://github.com/Daniel-v8/Loudless.git
         tag: v1.0.0
-        commit: e23d2b19d4adb17881be817dcc6d17dae47fc5cb
+        commit: 9b4da4dd7a95d6cbe4426358abc706b27eaf587b
