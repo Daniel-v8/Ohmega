@@ -18,7 +18,7 @@
       <li>Supports FLAC, WAV, MP3, OGG, OPUS, M4A, AAC, WMA, APE, WavPack</li>
       <li>Lossless processing for FLAC, WAV, AIFF, APE and WavPack</li>
       <li>Automatic backup of originals before modifying</li>
-      <li>Three loudness targets: Streaming (−14 LUFS), ReplayGain (−18 LUFS), CD/Mastering (−23 LUFS)</li>
+      <li>Three loudness targets: Streaming (−14 LUFS), ReplayGain (−18 LUFS), Broadcast/Film (−23 LUFS)</li>
     </ul>
   </description>
 

@@ -19,7 +19,7 @@ from mutagen.id3 import ID3, TXXX
 TARGETS = {
     "Streaming (-14 LUFS)": -14.0,
     "ReplayGain 2.0 (-18 LUFS)": -18.0,
-    "CD / Mastering (-23 LUFS)": -23.0,
+    "Broadcast / Film (-23 LUFS)": -23.0,
 }
 
 ICON_PATH = str(Path(__file__).parent / "ohmega.png")
