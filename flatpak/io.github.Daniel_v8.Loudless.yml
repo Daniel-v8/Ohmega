@@ -67,7 +67,7 @@ modules:
     build-commands:
       - install -Dm644 main.py /app/share/loudless/main.py
       - install -Dm644 ohmega.png /app/share/loudless/ohmega.png
-      - install -Dm644 ohmega.png /app/share/icons/hicolor/512x512/apps/io.github.Daniel_v8.Loudless.png
+      - install -Dm644 ohmega-512.png /app/share/icons/hicolor/512x512/apps/io.github.Daniel_v8.Loudless.png
       - install -Dm644 flatpak/io.github.Daniel_v8.Loudless.desktop /app/share/applications/io.github.Daniel_v8.Loudless.desktop
       - install -Dm644 flatpak/io.github.Daniel_v8.Loudless.metainfo.xml /app/share/metainfo/io.github.Daniel_v8.Loudless.metainfo.xml
       - install -Dm755 flatpak/loudless-launch.sh /app/bin/loudless
