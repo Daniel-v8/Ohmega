@@ -1,4 +1,4 @@
-# Loudless
+# Ohmega
 
 Normalize audio loudness for FLAC, MP3, WAV, OGG, OPUS, M4A and more — directly in the file, no player configuration needed.
 
