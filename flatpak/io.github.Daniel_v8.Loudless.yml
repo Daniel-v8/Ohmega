@@ -75,4 +75,4 @@ modules:
       - type: git
         url: https://github.com/Daniel-v8/Ohmega.git
         tag: v1.1.0
-        commit: PLACEHOLDER
+        commit: 155504104d0ccf559af6e52053714bcbfa71d4e8
