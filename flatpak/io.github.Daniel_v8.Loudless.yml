@@ -62,17 +62,17 @@ modules:
         url: https://files.pythonhosted.org/packages/b0/7a/620f945b96be1f6ee357d211d5bf74ab1b7fe72a9f1525aafbfe3aee6875/mutagen-1.47.0-py3-none-any.whl
         sha256: edd96f50c5907a9539d8e5bba7245f62c9f520aef333d13392a79a4f70aca719
 
-  - name: loudless
+  - name: ohmega
     buildsystem: simple
     build-commands:
       - install -Dm644 main.py /app/share/loudless/main.py
-      - install -Dm644 loudless.png /app/share/loudless/loudless.png
-      - install -Dm644 loudless.png /app/share/icons/hicolor/512x512/apps/io.github.Daniel_v8.Loudless.png
+      - install -Dm644 ohmega.png /app/share/loudless/ohmega.png
+      - install -Dm644 ohmega.png /app/share/icons/hicolor/512x512/apps/io.github.Daniel_v8.Loudless.png
       - install -Dm644 flatpak/io.github.Daniel_v8.Loudless.desktop /app/share/applications/io.github.Daniel_v8.Loudless.desktop
       - install -Dm644 flatpak/io.github.Daniel_v8.Loudless.metainfo.xml /app/share/metainfo/io.github.Daniel_v8.Loudless.metainfo.xml
       - install -Dm755 flatpak/loudless-launch.sh /app/bin/loudless
     sources:
       - type: git
-        url: https://github.com/Daniel-v8/Loudless.git
-        tag: v1.0.0
-        commit: 9b4da4dd7a95d6cbe4426358abc706b27eaf587b
+        url: https://github.com/Daniel-v8/Ohmega.git
+        tag: v1.1.0
+        commit: PLACEHOLDER

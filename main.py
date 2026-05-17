@@ -22,7 +22,7 @@ TARGETS = {
     "CD / Mastering (-23 LUFS)": -23.0,
 }
 
-ICON_PATH = str(Path(__file__).parent / "loudless.png")
+ICON_PATH = str(Path(__file__).parent / "ohmega.png")
 
 
 def measure_lufs(filepath: str) -> float:
@@ -64,7 +64,7 @@ LOSSLESS_EXTENSIONS = {".flac", ".wav", ".aiff", ".aif", ".ape", ".wv"}
 
 def apply_gain_direct(filepath: str, gain: float):
     p = Path(filepath)
-    tmp = p.with_suffix(".loudless_tmp" + p.suffix)
+    tmp = p.with_suffix(".ohmega_tmp" + p.suffix)
     ext = p.suffix.lower()
     codec = CODEC_MAP.get(ext)
     if codec is None:
@@ -104,7 +104,7 @@ class ScanWorker(QThread):
 
 def backup_file(filepath: str) -> str:
     p = Path(filepath)
-    backup_dir = p.parent / "Loudless Backup"
+    backup_dir = p.parent / "Ohmega Backup"
     backup_dir.mkdir(exist_ok=True)
     dest = backup_dir / p.name
     if not dest.exists():
@@ -183,7 +183,7 @@ class DropArea(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Loudless")
+        self.setWindowTitle("Ohmega")
         self.setMinimumSize(800, 560)
         self.setWindowIcon(QIcon(ICON_PATH))
         self.files = []
@@ -214,11 +214,11 @@ class MainWindow(QMainWindow):
         self.btn_apply = QPushButton("Normalize loudness")
         self.btn_apply.clicked.connect(self.apply)
         self.btn_apply.setEnabled(False)
-        self.btn_apply.setStyleSheet("QPushButton { background: #2d6a2d; color: white; } QPushButton:hover { background: #3a8a3a; color: white; }")
+        self.btn_apply.setStyleSheet("QPushButton { background: #c94b0a; color: white; } QPushButton:hover { background: #e05510; color: white; }")
 
         self.chk_backup = QCheckBox("Backup originals")
         self.chk_backup.setChecked(True)
-        self.chk_backup.setToolTip("Copies originals to 'Loudless Backup/' subfolder before modifying")
+        self.chk_backup.setToolTip("Copies originals to 'Ohmega Backup/' subfolder before modifying")
 
         for w in [self.btn_add, self.btn_clear, self.target_combo, self.btn_scan, self.chk_backup, self.btn_apply]:
             ctrl.addWidget(w)
@@ -347,7 +347,7 @@ class MainWindow(QMainWindow):
         self.btn_apply.setEnabled(True)
         self.progress.setVisible(False)
         backed = " + backup created" if self.apply_worker.do_backup else ""
-        self.status.setText(f"Done — loudness normalized directly in files{backed}")
+        self.status.setText(f"Done — loudness normalized directly in files{backed} — Ω")
 
 
 if __name__ == "__main__":

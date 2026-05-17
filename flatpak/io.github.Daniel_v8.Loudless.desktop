@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Loudless
+Name=Ohmega
 GenericName=Audio Loudness Normalizer
 Comment=Normalize audio loudness for FLAC, MP3, WAV and more
 Exec=loudless
