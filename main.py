@@ -104,7 +104,11 @@ class ScanWorker(QThread):
 
 def backup_file(filepath: str) -> str:
     p = Path(filepath)
-    backup_dir = p.parent / "Ohmega Backup"
+    # Flatpak document portal paths (/run/user/…) are read-only dirs — back up to ~/Ohmega Backup instead
+    if str(p).startswith("/run/user/"):
+        backup_dir = Path.home() / "Ohmega Backup"
+    else:
+        backup_dir = p.parent / "Ohmega Backup"
     backup_dir.mkdir(exist_ok=True)
     dest = backup_dir / p.name
     if not dest.exists():
