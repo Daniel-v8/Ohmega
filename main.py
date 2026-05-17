@@ -352,6 +352,8 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setApplicationName("Ohmega")
+    app.setDesktopFileName("io.github.Daniel_v8.Loudless")
     app.setStyle("Fusion")
     win = MainWindow()
     win.show()

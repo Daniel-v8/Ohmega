@@ -9,4 +9,5 @@ Icon=io.github.Daniel_v8.Loudless
 Categories=AudioVideo;Audio;Utility;
 Keywords=audio;loudness;normalize;flac;mp3;replaygain;volume;
 StartupNotify=true
+StartupWMClass=Ohmega
 Terminal=false
