@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loudless — Audio Loudness Normalizer</title>
+  <title>Ohmega — Audio Loudness Normalizer</title>
   <meta name="description" content="Normalize audio loudness directly in your files. Supports FLAC, MP3, WAV, OGG and more. Free and open source for Linux.">
   <link rel="icon" type="image/png" href="icon.png">
   <style>
@@ -12,7 +12,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: #3a7a3a;
+      background: #111111;
       color: #ffffff;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       line-height: 1.6;
@@ -22,9 +22,9 @@
     nav {
       position: sticky;
       top: 0;
-      background: rgba(20,48,20,0.95);
+      background: rgba(10,10,10,0.95);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid #2a402a;
+      border-bottom: 1px solid #252525;
       padding: 0 2rem;
       height: 60px;
       display: flex;
@@ -41,15 +41,15 @@
       color: #ffffff;
       text-decoration: none;
     }
-    .nav-logo img { width: 30px; height: 30px; }
+    .nav-logo img { width: 30px; height: 30px; border-radius: 7px; }
     .nav-links { display: flex; gap: 1.5rem; }
     .nav-links a {
-      color: #cce8cc;
+      color: #c8b8a8;
       text-decoration: none;
       font-size: 0.95rem;
       transition: color 0.2s;
     }
-    .nav-links a:hover { color: #88e8b0; }
+    .nav-links a:hover { color: #e07535; }
 
     /* HERO — 2-column */
     .hero {
@@ -65,21 +65,21 @@
       width: 88px;
       height: 88px;
       border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
       margin-bottom: 1.2rem;
       display: block;
     }
     .hero h1 {
       font-size: 3rem;
       font-weight: 800;
-      color: #88e8b0;
+      color: #e07535;
       margin-bottom: 1rem;
       letter-spacing: -1px;
       line-height: 1.1;
     }
     .hero p {
       font-size: 1.15rem;
-      color: #cce8cc;
+      color: #c8b8a8;
       margin-bottom: 2rem;
       max-width: 420px;
     }
@@ -102,8 +102,8 @@
       border: none;
     }
     .btn:hover { opacity: 0.85; transform: translateY(-1px); }
-    .btn-primary  { background: #88e8b0; color: #0d1f0d; }
-    .btn-secondary { background: #3a3a3a; color: #c8c8c8; }
+    .btn-primary  { background: #c94b0a; color: #ffffff; }
+    .btn-secondary { background: #2a2a2a; color: #c8c8c8; }
 
     /* APP WINDOW */
     .app-window { display: block; }
@@ -125,7 +125,7 @@
     .section-title {
       font-size: 1.8rem;
       font-weight: 700;
-      color: #88e8b0;
+      color: #e07535;
       margin-bottom: 2rem;
       text-align: center;
     }
@@ -135,15 +135,15 @@
       gap: 1.2rem;
     }
     .feature-card {
-      background: #1e3d1e;
-      border: 1px solid #2a402a;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
       border-radius: 12px;
       padding: 1.4rem 1.6rem;
       transition: opacity 0.6s ease, transform 0.2s, box-shadow 0.2s;
     }
     .feature-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.45);
     }
     .feature-card h3 {
       font-size: 1rem;
@@ -153,18 +153,18 @@
     }
     .feature-card p {
       font-size: 0.9rem;
-      color: #cce8cc;
+      color: #c8b8a8;
     }
     .feature-icon {
       width: 44px;
       height: 44px;
       border-radius: 10px;
-      background: rgba(136, 232, 176, 0.12);
+      background: rgba(224, 117, 53, 0.14);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1rem;
-      color: #88e8b0;
+      color: #e07535;
     }
     .feature-icon svg {
       width: 22px;
@@ -173,8 +173,8 @@
 
     /* FORMATS */
     .formats-wrap {
-      background: #1e3d1e;
-      border: 1px solid #2a402a;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
       border-radius: 12px;
       padding: 2rem;
       margin-top: 1rem;
@@ -188,7 +188,7 @@
     .format-row + .format-row { margin-top: 1.2rem; }
     .format-label {
       font-size: 0.8rem;
-      color: #cce8cc;
+      color: #c8b8a8;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 0.4rem;
@@ -200,14 +200,14 @@
       font-weight: 600;
       font-family: monospace;
     }
-    .tag-lossless { background: #1e3d2a; color: #5ecf8a; border: 1px solid #2a5a3a; }
-    .tag-lossy    { background: #2e2a1a; color: #c8a84a; border: 1px solid #4a3a1a; }
+    .tag-lossless { background: #1e2a1e; color: #5ecf8a; border: 1px solid #2a4a2a; }
+    .tag-lossy    { background: #2e2010; color: #c8943a; border: 1px solid #4a3010; }
 
     /* INSTALL */
     .install-section {
-      background: #1e3d1e;
-      border-top: 1px solid #2a402a;
-      border-bottom: 1px solid #2a402a;
+      background: #161616;
+      border-top: 1px solid #252525;
+      border-bottom: 1px solid #252525;
     }
     .install-steps {
       display: flex;
@@ -221,11 +221,11 @@
     }
     .step-label {
       font-size: 0.85rem;
-      color: #cce8cc;
+      color: #c8b8a8;
     }
     .code-block {
-      background: #0f1f0f;
-      border: 1px solid #2a402a;
+      background: #0d0d0d;
+      border: 1px solid #2a2a2a;
       border-radius: 8px;
       padding: 0.9rem 1.2rem;
       display: flex;
@@ -236,11 +236,11 @@
     .code-block code {
       font-family: 'Cascadia Code', 'Fira Code', monospace;
       font-size: 0.9rem;
-      color: #a0d4a0;
+      color: #c8a070;
       word-break: break-all;
     }
     .copy-btn {
-      background: #3a3a3a;
+      background: #2a2a2a;
       color: #c8c8c8;
       border: none;
       border-radius: 6px;
@@ -251,8 +251,8 @@
       transition: background 0.2s;
       flex-shrink: 0;
     }
-    .copy-btn:hover { background: #4a4a4a; }
-    .copy-btn.copied { background: #6dd49a; color: white; }
+    .copy-btn:hover { background: #3a3a3a; }
+    .copy-btn.copied { background: #c94b0a; color: white; }
 
     /* SCREENSHOTS GALLERY */
     .gallery {
@@ -271,18 +271,18 @@
       transition: filter 0.25s;
     }
     .gallery-item:hover img {
-      filter: drop-shadow(0 24px 52px rgba(0,0,0,0.8));
+      filter: drop-shadow(0 24px 52px rgba(0,0,0,0.85));
     }
 
     /* FOOTER */
     footer {
       text-align: center;
       padding: 3rem 2rem;
-      color: #cce8cc;
+      color: #c8b8a8;
       font-size: 0.9rem;
-      border-top: 1px solid #2a402a;
+      border-top: 1px solid #252525;
     }
-    footer a { color: #88e8b0; text-decoration: none; }
+    footer a { color: #e07535; text-decoration: none; }
     footer a:hover { text-decoration: underline; }
 
     /* SCROLL ANIMATIONS */
@@ -332,29 +332,29 @@
 
 <nav>
   <a class="nav-logo" href="#">
-    <img src="icon.png" alt="Loudless">
-    Loudless
+    <img src="icon.png" alt="Ohmega">
+    Ohmega
   </a>
   <div class="nav-links">
     <a href="#features">Features</a>
     <a href="#install">Install</a>
-    <a href="https://github.com/Daniel-v8/Loudless">GitHub</a>
+    <a href="https://github.com/Daniel-v8/Ohmega">GitHub</a>
   </div>
 </nav>
 
 <section class="hero">
   <div class="hero-text fade-left">
-    <img class="hero-icon" src="icon.png" alt="Loudless icon">
-    <h1>Loudless</h1>
+    <img class="hero-icon" src="icon.png" alt="Ohmega icon">
+    <h1>Ohmega</h1>
     <p>Normalize audio loudness directly in your files — no tags, no player config, every player gets it right.</p>
     <div class="hero-buttons">
       <a href="#install" class="btn btn-primary">Install on Linux</a>
-      <a href="https://github.com/Daniel-v8/Loudless" class="btn btn-secondary">View on GitHub</a>
+      <a href="https://github.com/Daniel-v8/Ohmega" class="btn btn-secondary">View on GitHub</a>
     </div>
   </div>
   <div class="hero-visual fade-right">
     <div class="app-window">
-      <img src="screenshots/05-done.png" alt="Loudless showing normalized files with gain values">
+      <img src="screenshots/05-done.png" alt="Ohmega showing normalized files with gain values">
     </div>
   </div>
 </section>
@@ -387,7 +387,7 @@
         <line x1="12" y1="3" x2="12" y2="15"/>
       </svg></div>
       <h3>Drag & Drop</h3>
-      <p>Drop files or entire folders. Loudless processes everything recursively and shows loudness per file before you commit.</p>
+      <p>Drop files or entire folders. Ohmega processes everything recursively and shows loudness per file before you commit.</p>
     </div>
     <div class="feature-card fade-up" style="transition-delay:160ms">
       <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
@@ -395,7 +395,7 @@
         <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
       </svg></div>
       <h3>Automatic Backup</h3>
-      <p>Originals are copied to a "Loudless Backup" subfolder before any changes are made. One checkbox, always on by default.</p>
+      <p>Originals are copied to an "Ohmega Backup" subfolder before any changes are made. One checkbox, always on by default.</p>
     </div>
     <div class="feature-card fade-up" style="transition-delay:240ms">
       <div class="feature-icon"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -442,17 +442,17 @@
     <h2 class="section-title fade-up">Install</h2>
     <div class="install-steps fade-up">
       <div class="step">
-        <span class="step-label">1. Add the Loudless repository</span>
+        <span class="step-label">1. Add the Ohmega repository</span>
         <div class="code-block">
-          <code>flatpak remote-add --if-not-exists loudless https://daniel-v8.github.io/Loudless/repo</code>
-          <button class="copy-btn" onclick="copyCmd(this, 'flatpak remote-add --if-not-exists loudless https://daniel-v8.github.io/Loudless/repo')">Copy</button>
+          <code>flatpak remote-add --if-not-exists ohmega https://daniel-v8.github.io/Ohmega/repo</code>
+          <button class="copy-btn" onclick="copyCmd(this, 'flatpak remote-add --if-not-exists ohmega https://daniel-v8.github.io/Ohmega/repo')">Copy</button>
         </div>
       </div>
       <div class="step">
-        <span class="step-label">2. Install Loudless</span>
+        <span class="step-label">2. Install Ohmega</span>
         <div class="code-block">
-          <code>flatpak install loudless io.github.Daniel_v8.Loudless</code>
-          <button class="copy-btn" onclick="copyCmd(this, 'flatpak install loudless io.github.Daniel_v8.Loudless')">Copy</button>
+          <code>flatpak install ohmega io.github.Daniel_v8.Loudless</code>
+          <button class="copy-btn" onclick="copyCmd(this, 'flatpak install ohmega io.github.Daniel_v8.Loudless')">Copy</button>
         </div>
       </div>
       <div class="step">
@@ -463,8 +463,8 @@
         </div>
       </div>
     </div>
-    <p style="margin-top:1.5rem; color:#cce8cc; font-size:0.9rem;">
-      Requires <a href="https://flatpak.org/setup/" style="color:#88e8b0">Flatpak</a> installed on your system. Works on Fedora, Ubuntu, Arch and any Linux distro.
+    <p style="margin-top:1.5rem; color:#c8b8a8; font-size:0.9rem;">
+      Requires <a href="https://flatpak.org/setup/" style="color:#e07535">Flatpak</a> installed on your system. Works on Fedora, Ubuntu, Arch and any Linux distro.
     </p>
   </div>
 </div>
@@ -488,9 +488,9 @@
 </div>
 
 <footer>
-  <p>Loudless is free and open source — <a href="https://github.com/Daniel-v8/Loudless">MIT License</a></p>
+  <p>Ohmega is free and open source — <a href="https://github.com/Daniel-v8/Ohmega">MIT License</a></p>
   <p style="margin-top:0.4rem">Made by <a href="https://github.com/Daniel-v8">Daniel-v8</a></p>
-  <p style="margin-top:0.4rem">Contact: <a href="mailto:loudless.spender000@passinbox.com">loudless.spender000@passinbox.com</a> <span style="color:#88a088; font-size:0.82rem">(PassInbox alias)</span></p>
+  <p style="margin-top:0.4rem">Contact: <a href="mailto:loudless.spender000@passinbox.com">loudless.spender000@passinbox.com</a> <span style="color:#887868; font-size:0.82rem">(PassInbox alias)</span></p>
 </footer>
 
 <script>

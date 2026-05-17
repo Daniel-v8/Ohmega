@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>io.github.Daniel_v8.Loudless</id>
-  <name>Loudless</name>
+  <name>Ohmega</name>
   <summary>Normalize audio loudness directly in your files</summary>
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
 
   <description>
     <p>
-      Loudless normalizes the loudness of your audio files using the EBU R128 standard.
-      Unlike ReplayGain tags, Loudless writes the gain directly into the audio data —
+      Ohmega normalizes the loudness of your audio files using the EBU R128 standard.
+      Unlike ReplayGain tags, Ohmega writes the gain directly into the audio data —
       so your files play at the correct volume in every player without any configuration.
     </p>
     <p>Features:</p>
@@ -24,8 +24,8 @@
 
   <launchable type="desktop-id">io.github.Daniel_v8.Loudless.desktop</launchable>
 
-  <url type="homepage">https://github.com/Daniel-v8/Loudless</url>
-  <url type="bugtracker">https://github.com/Daniel-v8/Loudless/issues</url>
+  <url type="homepage">https://github.com/Daniel-v8/Ohmega</url>
+  <url type="bugtracker">https://github.com/Daniel-v8/Ohmega/issues</url>
 
   <developer id="io.github.daniel-v8">
     <name>Daniel-v8</name>
@@ -76,6 +76,11 @@
   </screenshots>
 
   <releases>
+    <release version="1.1.0" date="2026-05-17">
+      <description>
+        <p>Rebranded to Ohmega — new icon, orange accent color, and updated backup folder name</p>
+      </description>
+    </release>
     <release version="1.0.0" date="2026-05-15">
       <description>
         <p>Initial release</p>
