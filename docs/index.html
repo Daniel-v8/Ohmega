@@ -257,7 +257,7 @@
     /* SCREENSHOTS GALLERY */
     .gallery {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 1.2rem;
     }
     .gallery-item {
@@ -321,6 +321,9 @@
       .hero-visual { order: 2; }
       .gallery { grid-template-columns: 1fr; }
     }
+    @media (max-width: 1000px) and (min-width: 801px) {
+      .gallery { grid-template-columns: repeat(2, 1fr); }
+    }
     @media (max-width: 600px) {
       .hero h1 { font-size: 2.2rem; }
       nav { padding: 0 1rem; }
@@ -354,7 +357,7 @@
   </div>
   <div class="hero-visual fade-right">
     <div class="app-window">
-      <img src="screenshots/05-done.png" alt="Ohmega showing normalized files with gain values">
+      <img src="screenshots/02-loaded.png" alt="Ohmega with files loaded and ready to normalize">
     </div>
   </div>
 </section>
@@ -473,16 +476,13 @@
   <h2 class="section-title fade-up">Screenshots</h2>
   <div class="gallery">
     <div class="app-window gallery-item fade-up" style="transition-delay:0ms">
-      <img src="screenshots/02-files-loaded.png" alt="Files loaded">
+      <img src="screenshots/01-empty.png" alt="Empty state — ready to drop files">
     </div>
     <div class="app-window gallery-item fade-up" style="transition-delay:100ms">
-      <img src="screenshots/03-scanning.png" alt="Scanning loudness">
+      <img src="screenshots/02-loaded.png" alt="Files loaded and scanned">
     </div>
     <div class="app-window gallery-item fade-up" style="transition-delay:200ms">
-      <img src="screenshots/04-normalizing.png" alt="Normalizing">
-    </div>
-    <div class="app-window gallery-item fade-up" style="transition-delay:300ms">
-      <img src="screenshots/05-done.png" alt="Done">
+      <img src="screenshots/03-normalizing.png" alt="Normalizing in progress">
     </div>
   </div>
 </div>

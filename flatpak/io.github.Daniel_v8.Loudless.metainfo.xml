@@ -54,28 +54,25 @@
 
   <screenshots>
     <screenshot type="default">
-      <caption>Files loaded and ready to scan</caption>
-      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/screenshots/02-files-loaded.png</image>
-    </screenshot>
-    <screenshot>
-      <caption>Scanning loudness levels</caption>
-      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/screenshots/03-scanning.png</image>
+      <caption>Files loaded and ready to normalize</caption>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/docs/screenshots/02-loaded.png</image>
     </screenshot>
     <screenshot>
       <caption>Normalizing audio directly in files</caption>
-      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/screenshots/04-normalizing.png</image>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/docs/screenshots/03-normalizing.png</image>
     </screenshot>
     <screenshot>
-      <caption>Done — gain applied and displayed per file</caption>
-      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/screenshots/05-done.png</image>
-    </screenshot>
-    <screenshot>
-      <caption>Main window</caption>
-      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/screenshots/01-empty.png</image>
+      <caption>Main window — empty state</caption>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/docs/screenshots/01-empty.png</image>
     </screenshot>
   </screenshots>
 
   <releases>
+    <release version="1.1.1" date="2026-05-17">
+      <description>
+        <p>Fixed backup failing for files opened via drag and drop in Flatpak (portal paths)</p>
+      </description>
+    </release>
     <release version="1.1.0" date="2026-05-17">
       <description>
         <p>Rebranded to Ohmega — new icon, orange accent color, and updated backup folder name</p>
