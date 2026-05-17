@@ -75,5 +75,5 @@ modules:
     sources:
       - type: git
         url: https://github.com/Daniel-v8/Ohmega.git
-        tag: v1.1.0
-        commit: 155504104d0ccf559af6e52053714bcbfa71d4e8
+        tag: v1.1.1
+        commit: e7bfdd4a8c40cbcad8aaf3d5f2cd4f3fca98a4bf
