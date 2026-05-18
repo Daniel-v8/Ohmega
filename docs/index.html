@@ -430,21 +430,20 @@
     <h2 class="section-title fade-up">Install</h2>
     <div class="install-steps fade-up">
       <div class="step">
-        <span class="step-label">1. Add the Ohmega repository</span>
-        <div class="code-block">
-          <code>flatpak remote-add --if-not-exists ohmega https://daniel-v8.github.io/Ohmega/repo</code>
-          <button class="copy-btn" onclick="copyCmd(this, 'flatpak remote-add --if-not-exists ohmega https://daniel-v8.github.io/Ohmega/repo')">Copy</button>
+        <span class="step-label">1. Download the .flatpak bundle from GitHub Releases</span>
+        <div class="code-block" style="justify-content:flex-start;">
+          <a href="https://github.com/Daniel-v8/Ohmega/releases/latest" style="color:#e07535; font-family:'Cascadia Code','Fira Code',monospace; font-size:0.9rem; text-decoration:none;">github.com/Daniel-v8/Ohmega/releases/latest</a>
         </div>
       </div>
       <div class="step">
-        <span class="step-label">2. Install Ohmega</span>
+        <span class="step-label">2. Install</span>
         <div class="code-block">
-          <code>flatpak install ohmega io.github.Daniel_v8.Ohmega</code>
-          <button class="copy-btn" onclick="copyCmd(this, 'flatpak install ohmega io.github.Daniel_v8.Ohmega')">Copy</button>
+          <code>flatpak install --user ohmega.flatpak</code>
+          <button class="copy-btn" onclick="copyCmd(this, 'flatpak install --user ohmega.flatpak')">Copy</button>
         </div>
       </div>
       <div class="step">
-        <span class="step-label">Or run without installing</span>
+        <span class="step-label">3. Run</span>
         <div class="code-block">
           <code>flatpak run io.github.Daniel_v8.Ohmega</code>
           <button class="copy-btn" onclick="copyCmd(this, 'flatpak run io.github.Daniel_v8.Ohmega')">Copy</button>
@@ -452,7 +451,7 @@
       </div>
     </div>
     <p style="margin-top:1.5rem; color:#c8b8a8; font-size:0.9rem;">
-      Requires <a href="https://flatpak.org/setup/" style="color:#e07535">Flatpak</a> installed on your system. Works on Fedora, Ubuntu, Arch and any Linux distro.
+      Requires <a href="https://flatpak.org/setup/" style="color:#e07535">Flatpak</a> and the <a href="https://kde.org/products/plasma/" style="color:#e07535">KDE Platform 6.9</a> runtime. Works on Fedora, Ubuntu, Arch and any Linux distro.
     </p>
   </div>
 </div>
