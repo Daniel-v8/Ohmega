@@ -14,9 +14,8 @@ sha256sums=('SKIP')
 package() {
 	cd "$srcdir/Ohmega"
 
-	install -d "$pkgdir/usr/share/$pkgname"
-	cp main.py "$pkgdir/usr/share/$pkgname/"
-	install -Dm644 ohmega.png "$pkgdir/usr/share/$pkgname/"
+	install -Dm644 main.py "$pkgdir/usr/share/$pkgname/main.py"
+	install -Dm644 ohmega.png "$pkgdir/usr/share/$pkgname/ohmega.png"
 
 	install -Dm755 scripts/launcher.sh "$pkgdir/usr/bin/ohmega"
 }
