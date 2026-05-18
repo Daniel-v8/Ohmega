@@ -11,7 +11,7 @@ BuildArch:      noarch
 
 BuildRequires:  python3-devel
 BuildRequires:  desktop-file-utils
-BuildRequires:  libappstream-glib
+BuildRequires:  appstream
 
 Requires:       python3-pyqt6
 Requires:       python3-mutagen
@@ -30,7 +30,7 @@ Supports: FLAC, WAV, AIFF, APE, WavPack (lossless), MP3, OGG, OPUS, M4A, AAC, WM
 %autosetup -n Ohmega-%{version}
 
 %install
-install -Dm755 main.py        %{buildroot}%{_datadir}/ohmega/main.py
+install -Dm644 main.py        %{buildroot}%{_datadir}/ohmega/main.py
 install -Dm644 ohmega.png     %{buildroot}%{_datadir}/ohmega/ohmega.png
 install -Dm644 ohmega-512.png %{buildroot}%{_datadir}/pixmaps/ohmega.png
 
@@ -39,19 +39,16 @@ install -Dm644 flatpak/io.github.Daniel_v8.Ohmega.desktop \
 install -Dm644 flatpak/io.github.Daniel_v8.Ohmega.metainfo.xml \
     %{buildroot}%{_datadir}/metainfo/io.github.Daniel_v8.Ohmega.metainfo.xml
 
-# Launcher script
-install -Dm755 /dev/stdin %{buildroot}%{_bindir}/ohmega << 'EOF'
-#!/bin/bash
-exec python3 /usr/share/ohmega/main.py "$@"
-EOF
+printf '#!/bin/bash\nexec python3 /usr/share/ohmega/main.py "$@"\n' \
+    > %{buildroot}%{_bindir}/ohmega
+chmod 755 %{buildroot}%{_bindir}/ohmega
 
-# Fix desktop file icon to use system icon name
 sed -i 's|^Icon=.*|Icon=ohmega|' \
     %{buildroot}%{_datadir}/applications/ohmega.desktop
 
 %check
 desktop-file-validate %{buildroot}%{_datadir}/applications/ohmega.desktop
-appstream-util validate-relax --nonet \
+appstreamcli validate --no-net \
     %{buildroot}%{_datadir}/metainfo/io.github.Daniel_v8.Ohmega.metainfo.xml
 
 %files
@@ -63,11 +60,11 @@ appstream-util validate-relax --nonet \
 %{_datadir}/metainfo/io.github.Daniel_v8.Ohmega.metainfo.xml
 
 %changelog
-* Sun May 17 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.1.1-1
+* Mon May 18 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.1.1-1
 - Fix backup failing for files opened via drag and drop (Flatpak portal paths)
 
 * Sun May 17 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.1.0-1
 - Rebranded to Ohmega, new icon, orange accent color
 
-* Thu May 15 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.0.0-1
+* Fri May 15 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.0.0-1
 - Initial release
