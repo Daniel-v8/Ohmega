@@ -254,24 +254,12 @@
     .copy-btn:hover { background: #3a3a3a; }
     .copy-btn.copied { background: #c94b0a; color: white; }
 
-    /* SCREENSHOTS GALLERY */
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.2rem;
-    }
-    .gallery-item {
-      transition: opacity 0.6s ease, transform 0.25s;
-      cursor: pointer;
-    }
-    .gallery-item:hover {
-      transform: scale(1.04) translateY(-5px);
-    }
-    .gallery-item img {
-      transition: filter 0.25s;
-    }
-    .gallery-item:hover img {
-      filter: drop-shadow(0 24px 52px rgba(0,0,0,0.85));
+    /* SCREENCAST */
+    .demo-video {
+      width: 100%;
+      border-radius: 14px;
+      display: block;
+      box-shadow: 0 28px 72px rgba(0,0,0,0.7);
     }
 
     /* FOOTER */
@@ -319,10 +307,6 @@
       .hero p { max-width: 100%; }
       .hero-buttons { justify-content: center; }
       .hero-visual { order: 2; }
-      .gallery { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 1000px) and (min-width: 801px) {
-      .gallery { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 600px) {
       .hero h1 { font-size: 2.2rem; }
@@ -340,6 +324,7 @@
   </a>
   <div class="nav-links">
     <a href="#features">Features</a>
+    <a href="#demo">Demo</a>
     <a href="#install">Install</a>
     <a href="https://github.com/Daniel-v8/Ohmega">GitHub</a>
   </div>
@@ -357,7 +342,7 @@
   </div>
   <div class="hero-visual fade-right">
     <div class="app-window">
-      <img src="screenshots/02-loaded.png" alt="Ohmega with files loaded and ready to normalize">
+      <img src="screenshots/hero.png" alt="Ohmega with files loaded and ready to normalize">
     </div>
   </div>
 </section>
@@ -472,18 +457,12 @@
   </div>
 </div>
 
-<div class="section" id="screenshots">
-  <h2 class="section-title fade-up">Screenshots</h2>
-  <div class="gallery">
-    <div class="app-window gallery-item fade-up" style="transition-delay:0ms">
-      <img src="screenshots/01-empty.png" alt="Empty state — ready to drop files">
-    </div>
-    <div class="app-window gallery-item fade-up" style="transition-delay:100ms">
-      <img src="screenshots/02-loaded.png" alt="Files loaded and scanned">
-    </div>
-    <div class="app-window gallery-item fade-up" style="transition-delay:200ms">
-      <img src="screenshots/03-normalizing.png" alt="Normalizing in progress">
-    </div>
+<div class="section" id="demo">
+  <h2 class="section-title fade-up">See it in action</h2>
+  <div class="fade-up">
+    <video class="demo-video" autoplay muted loop playsinline>
+      <source src="screenshots/demo.webm" type="video/webm">
+    </video>
   </div>
 </div>
 
