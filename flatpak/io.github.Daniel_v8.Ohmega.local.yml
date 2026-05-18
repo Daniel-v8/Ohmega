@@ -1,4 +1,4 @@
-app-id: io.github.Daniel_v8.Loudless
+app-id: io.github.Daniel_v8.Ohmega
 runtime: org.kde.Platform
 runtime-version: '6.9'
 sdk: org.kde.Sdk
@@ -68,12 +68,10 @@ modules:
     build-commands:
       - install -Dm644 main.py /app/share/loudless/main.py
       - install -Dm644 ohmega.png /app/share/loudless/ohmega.png
-      - install -Dm644 ohmega-512.png /app/share/icons/hicolor/512x512/apps/io.github.Daniel_v8.Loudless.png
-      - install -Dm644 flatpak/io.github.Daniel_v8.Loudless.desktop /app/share/applications/io.github.Daniel_v8.Loudless.desktop
-      - install -Dm644 flatpak/io.github.Daniel_v8.Loudless.metainfo.xml /app/share/metainfo/io.github.Daniel_v8.Loudless.metainfo.xml
+      - install -Dm644 ohmega-512.png /app/share/icons/hicolor/512x512/apps/io.github.Daniel_v8.Ohmega.png
+      - install -Dm644 flatpak/io.github.Daniel_v8.Ohmega.desktop /app/share/applications/io.github.Daniel_v8.Ohmega.desktop
+      - install -Dm644 flatpak/io.github.Daniel_v8.Ohmega.metainfo.xml /app/share/metainfo/io.github.Daniel_v8.Ohmega.metainfo.xml
       - install -Dm755 flatpak/loudless-launch.sh /app/bin/loudless
     sources:
-      - type: git
-        url: https://github.com/Daniel-v8/Ohmega.git
-        tag: v1.1.1
-        commit: e7bfdd4a8c40cbcad8aaf3d5f2cd4f3fca98a4bf
+      - type: dir
+        path: ..

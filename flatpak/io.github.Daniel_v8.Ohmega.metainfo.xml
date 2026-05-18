@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.Daniel_v8.Loudless</id>
+  <id>io.github.Daniel_v8.Ohmega</id>
   <name>Ohmega</name>
   <summary>Normalize audio loudness directly in your files</summary>
   <metadata_license>MIT</metadata_license>
@@ -22,7 +22,7 @@
     </ul>
   </description>
 
-  <launchable type="desktop-id">io.github.Daniel_v8.Loudless.desktop</launchable>
+  <launchable type="desktop-id">io.github.Daniel_v8.Ohmega.desktop</launchable>
 
   <url type="homepage">https://github.com/Daniel-v8/Ohmega</url>
   <url type="bugtracker">https://github.com/Daniel-v8/Ohmega/issues</url>
