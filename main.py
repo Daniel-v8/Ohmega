@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.12
 import sys
 import os
+import json
 import subprocess
 from pathlib import Path
 
@@ -8,8 +9,9 @@ from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QFileDialog, QTableWidget, QTableWidgetItem,
     QProgressBar, QHeaderView, QAbstractItemView, QComboBox, QCheckBox,
+    QDoubleSpinBox, QInputDialog,
 )
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QEvent
 from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QColor, QIcon
 
 from mutagen.flac import FLAC
@@ -23,6 +25,21 @@ TARGETS = {
 }
 
 ICON_PATH = str(Path(__file__).parent / "ohmega.png")
+PROFILES_PATH = Path.home() / ".config" / "ohmega" / "profiles.json"
+
+
+def load_profiles() -> dict:
+    if PROFILES_PATH.exists():
+        try:
+            return json.loads(PROFILES_PATH.read_text())
+        except Exception:
+            pass
+    return {}
+
+
+def save_profiles(profiles: dict):
+    PROFILES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    PROFILES_PATH.write_text(json.dumps(profiles, indent=2))
 
 
 def measure_lufs(filepath: str) -> float:
@@ -188,10 +205,11 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Ohmega")
-        self.setMinimumSize(800, 560)
+        self.setMinimumSize(800, 580)
         self.setWindowIcon(QIcon(ICON_PATH))
         self.files = []
         self.lufs_values = []
+        self._profiles = load_profiles()
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -203,6 +221,7 @@ class MainWindow(QMainWindow):
         self.drop_area.files_dropped.connect(self.add_files)
         layout.addWidget(self.drop_area)
 
+        # Main controls row
         ctrl = QHBoxLayout()
         self.btn_add = QPushButton("+ Add files")
         self.btn_add.clicked.connect(self.browse_files)
@@ -212,6 +231,16 @@ class MainWindow(QMainWindow):
         self.target_combo = QComboBox()
         for label in TARGETS:
             self.target_combo.addItem(label)
+        self.target_combo.addItem("Custom")
+        self.target_combo.currentTextChanged.connect(self._on_target_changed)
+
+        self.custom_lufs_spin = QDoubleSpinBox()
+        self.custom_lufs_spin.setRange(-50.0, 0.0)
+        self.custom_lufs_spin.setValue(-16.0)
+        self.custom_lufs_spin.setSuffix(" LUFS")
+        self.custom_lufs_spin.setDecimals(1)
+        self.custom_lufs_spin.setFixedWidth(105)
+        self.custom_lufs_spin.setVisible(False)
 
         self.btn_scan = QPushButton("Scan loudness")
         self.btn_scan.clicked.connect(self.scan)
@@ -224,9 +253,36 @@ class MainWindow(QMainWindow):
         self.chk_backup.setChecked(True)
         self.chk_backup.setToolTip("Copies originals to 'Ohmega Backup/' subfolder before modifying")
 
-        for w in [self.btn_add, self.btn_clear, self.target_combo, self.btn_scan, self.chk_backup, self.btn_apply]:
+        for w in [self.btn_add, self.btn_clear, self.target_combo, self.custom_lufs_spin,
+                  self.btn_scan, self.chk_backup, self.btn_apply]:
             ctrl.addWidget(w)
         layout.addLayout(ctrl)
+
+        # Profiles row
+        prof = QHBoxLayout()
+        prof.addWidget(QLabel("Profile:"))
+
+        self.profile_combo = QComboBox()
+        self.profile_combo.setMinimumWidth(160)
+        self.profile_combo.addItem("(no profile)")
+        for name in self._profiles:
+            self.profile_combo.addItem(name)
+        self.profile_combo.currentTextChanged.connect(self._on_profile_selected)
+        prof.addWidget(self.profile_combo)
+
+        self.btn_profile_save = QPushButton("Save")
+        self.btn_profile_save.setToolTip("Save current settings as a profile")
+        self.btn_profile_save.clicked.connect(self._save_profile)
+        prof.addWidget(self.btn_profile_save)
+
+        self.btn_profile_delete = QPushButton("Delete")
+        self.btn_profile_delete.setToolTip("Delete selected profile")
+        self.btn_profile_delete.setEnabled(False)
+        self.btn_profile_delete.clicked.connect(self._delete_profile)
+        prof.addWidget(self.btn_profile_delete)
+
+        prof.addStretch()
+        layout.addLayout(prof)
 
         self.table = QTableWidget(0, 4)
         self.table.setHorizontalHeaderLabels(["File", "Format", "Loudness (LUFS)", "Gain"])
@@ -236,15 +292,32 @@ class MainWindow(QMainWindow):
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.installEventFilter(self)
         layout.addWidget(self.table)
 
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        self.status = QLabel("Add files and click Scan")
+        self.status = QLabel("Add files and click Scan  •  Select a row and press Delete to remove it")
         self.status.setStyleSheet("color: #aaa; font-size: 12px;")
         layout.addWidget(self.status)
+
+    def eventFilter(self, obj, event):
+        if obj is self.table and event.type() == QEvent.Type.KeyPress:
+            if event.key() == Qt.Key.Key_Delete:
+                self._delete_selected_rows()
+                return True
+        return super().eventFilter(obj, event)
+
+    def current_target(self) -> float:
+        label = self.target_combo.currentText()
+        if label == "Custom":
+            return self.custom_lufs_spin.value()
+        return TARGETS[label]
+
+    def _on_target_changed(self, text):
+        self.custom_lufs_spin.setVisible(text == "Custom")
 
     def add_files(self, files):
         existing = set(self.files)
@@ -282,6 +355,18 @@ class MainWindow(QMainWindow):
         self.btn_apply.setEnabled(False)
         self.status.setText("Add files and click Scan")
 
+    def _delete_selected_rows(self):
+        rows = sorted(set(idx.row() for idx in self.table.selectedIndexes()), reverse=True)
+        for row in rows:
+            self.table.removeRow(row)
+            del self.files[row]
+            del self.lufs_values[row]
+        if not self.files:
+            self.btn_apply.setEnabled(False)
+            self.status.setText("Add files and click Scan")
+        else:
+            self.status.setText(f"{len(self.files)} file(s) loaded")
+
     def scan(self):
         if not self.files:
             return
@@ -303,7 +388,7 @@ class MainWindow(QMainWindow):
         if status == "measured":
             self.lufs_values[row] = lufs
             item = QTableWidgetItem(f"{lufs:.1f} LUFS")
-            target = TARGETS[self.target_combo.currentText()]
+            target = self.current_target()
             diff = lufs - target
             if abs(diff) < 1:
                 item.setForeground(QColor("#4caf50"))
@@ -324,7 +409,7 @@ class MainWindow(QMainWindow):
             self.btn_apply.setEnabled(True)
 
     def apply(self):
-        target = TARGETS[self.target_combo.currentText()]
+        target = self.current_target()
         self.btn_apply.setEnabled(False)
         self.btn_scan.setEnabled(False)
         self.progress.setVisible(True)
@@ -352,6 +437,71 @@ class MainWindow(QMainWindow):
         self.progress.setVisible(False)
         backed = " + backup created" if self.apply_worker.do_backup else ""
         self.status.setText(f"Done — loudness normalized directly in files{backed} — Ω")
+        try:
+            subprocess.Popen(
+                ["notify-send", "-a", "Ohmega", "-i", ICON_PATH,
+                 "Ohmega", f"{len(self.files)} file(s) normalized{backed}"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+        except FileNotFoundError:
+            pass
+
+    # ── Profiles ─────────────────────────────────────────────────────────────
+
+    def _on_profile_selected(self, name):
+        self.btn_profile_delete.setEnabled(name != "(no profile)")
+        if name == "(no profile)" or name not in self._profiles:
+            return
+        p = self._profiles[name]
+        label = p.get("target_label", "Streaming (-14 LUFS)")
+        if label in TARGETS:
+            self.target_combo.setCurrentText(label)
+        elif label == "Custom":
+            self.target_combo.setCurrentText("Custom")
+            self.custom_lufs_spin.setValue(p.get("custom_lufs", -16.0))
+        self.chk_backup.setChecked(p.get("backup", True))
+
+    def _save_profile(self):
+        current_name = self.profile_combo.currentText()
+        if current_name == "(no profile)":
+            name, ok = QInputDialog.getText(self, "Save Profile", "Profile name:")
+            if not ok or not name.strip():
+                return
+            name = name.strip()
+        else:
+            name = current_name
+
+        label = self.target_combo.currentText()
+        self._profiles[name] = {
+            "target_label": label,
+            "custom_lufs": self.custom_lufs_spin.value(),
+            "backup": self.chk_backup.isChecked(),
+        }
+        save_profiles(self._profiles)
+        self._refresh_profile_combo(select=name)
+
+    def _delete_profile(self):
+        name = self.profile_combo.currentText()
+        if name == "(no profile)" or name not in self._profiles:
+            return
+        del self._profiles[name]
+        save_profiles(self._profiles)
+        self._refresh_profile_combo(select="(no profile)")
+
+    def _refresh_profile_combo(self, select: str = None):
+        self.profile_combo.blockSignals(True)
+        self.profile_combo.clear()
+        self.profile_combo.addItem("(no profile)")
+        for name in self._profiles:
+            self.profile_combo.addItem(name)
+        if select:
+            idx = self.profile_combo.findText(select)
+            if idx >= 0:
+                self.profile_combo.setCurrentIndex(idx)
+        self.profile_combo.blockSignals(False)
+        self.btn_profile_delete.setEnabled(
+            self.profile_combo.currentText() != "(no profile)"
+        )
 
 
 if __name__ == "__main__":
