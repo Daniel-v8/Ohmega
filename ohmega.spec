@@ -1,5 +1,5 @@
 Name:           ohmega
-Version:        1.1.1
+Version:        1.1.2
 Release:        1%{?dist}
 Summary:        Normalize audio loudness directly in your files
 License:        MIT
@@ -60,6 +60,9 @@ appstreamcli validate --no-net \
 %{_datadir}/metainfo/io.github.Daniel_v8.Ohmega.metainfo.xml
 
 %changelog
+* Tue May 19 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.1.2-1
+- Rename Flatpak app-id to io.github.Daniel_v8.Ohmega
+
 * Mon May 18 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.1.1-1
 - Fix backup failing for files opened via drag and drop (Flatpak portal paths)
 
