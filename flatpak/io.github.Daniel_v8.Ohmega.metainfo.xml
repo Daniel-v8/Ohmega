@@ -54,6 +54,10 @@
 
   <screenshots>
     <screenshot type="default">
+      <caption>Normalization done — loudness targets met across all files</caption>
+      <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/docs/screenshots/05-done.png</image>
+    </screenshot>
+    <screenshot>
       <caption>Files loaded and ready to normalize</caption>
       <image>https://raw.githubusercontent.com/Daniel-v8/Ohmega/main/docs/screenshots/02-loaded.png</image>
     </screenshot>
