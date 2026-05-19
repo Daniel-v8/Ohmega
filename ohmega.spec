@@ -2,7 +2,7 @@ Name:           ohmega
 Version:        1.1.2
 Release:        1%{?dist}
 Summary:        Normalize audio loudness directly in your files
-License:        MIT
+License:        GPL-3.0-only
 
 URL:            https://github.com/Daniel-v8/Ohmega
 Source0:        %{url}/archive/v%{version}/Ohmega-%{version}.tar.gz
@@ -39,6 +39,7 @@ install -Dm644 flatpak/io.github.Daniel_v8.Ohmega.desktop \
 install -Dm644 flatpak/io.github.Daniel_v8.Ohmega.metainfo.xml \
     %{buildroot}%{_datadir}/metainfo/io.github.Daniel_v8.Ohmega.metainfo.xml
 
+mkdir -p %{buildroot}%{_bindir}
 printf '#!/bin/bash\nexec python3 /usr/share/ohmega/main.py "$@"\n' \
     > %{buildroot}%{_bindir}/ohmega
 chmod 755 %{buildroot}%{_bindir}/ohmega

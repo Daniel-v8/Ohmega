@@ -4,7 +4,7 @@
   <name>Ohmega</name>
   <summary>Normalize audio loudness directly in your files</summary>
   <metadata_license>MIT</metadata_license>
-  <project_license>MIT</project_license>
+  <project_license>GPL-3.0-only</project_license>
 
   <description>
     <p>
