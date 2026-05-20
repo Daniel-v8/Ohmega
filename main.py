@@ -150,9 +150,12 @@ class ApplyWorker(QThread):
             if lufs is None:
                 continue
             try:
+                gain = self.target - lufs
+                if abs(gain) < 1.0:
+                    self.progress.emit(i, "skipped ✓")
+                    continue
                 if self.do_backup:
                     backup_file(f)
-                gain = self.target - lufs
                 apply_gain_direct(f, gain)
                 self.progress.emit(i, f"{gain:+.1f} dB ✓")
             except Exception as e:
@@ -425,7 +428,9 @@ class MainWindow(QMainWindow):
         self.progress.setValue(row + 1)
         self.status.setText(f"Processing {row + 1}/{len(self.files)}: {Path(self.files[row]).name}")
         item = QTableWidgetItem(result)
-        if "error" not in result:
+        if result.startswith("skipped"):
+            item.setForeground(QColor("#888888"))
+        elif "error" not in result:
             item.setForeground(QColor("#4caf50"))
         else:
             item.setForeground(QColor("#f44336"))
