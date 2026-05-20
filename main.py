@@ -151,7 +151,7 @@ class ApplyWorker(QThread):
                 continue
             try:
                 gain = self.target - lufs
-                if abs(gain) < 1.0:
+                if abs(gain) < 0.5:
                     self.progress.emit(i, "skipped ✓")
                     continue
                 if self.do_backup:
