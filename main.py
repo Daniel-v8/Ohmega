@@ -42,18 +42,52 @@ def save_profiles(profiles: dict):
     PROFILES_PATH.write_text(json.dumps(profiles, indent=2))
 
 
-def measure_lufs(filepath: str) -> float:
-    result = subprocess.run(
-        ["ffmpeg", "-i", filepath, "-af", "ebur128=peak=true", "-f", "null", "-"],
-        capture_output=True, text=True
-    )
-    for line in reversed(result.stderr.splitlines()):
+def _parse_integrated_lufs(stderr: str):
+    for line in reversed(stderr.splitlines()):
         if "I:" in line and "LUFS" in line:
             parts = line.split()
             for i, p in enumerate(parts):
                 if p == "I:":
                     return float(parts[i + 1])
-    raise ValueError(f"Could not measure loudness: {filepath}")
+    return None
+
+
+def measure_lufs(filepath: str) -> float:
+    result = subprocess.run(
+        ["ffmpeg", "-i", filepath, "-af", "ebur128=peak=true", "-f", "null", "-"],
+        capture_output=True, text=True
+    )
+    lufs = _parse_integrated_lufs(result.stderr)
+    if lufs is None:
+        raise ValueError(f"Could not measure loudness: {filepath}")
+    return lufs
+
+
+def measure_album_lufs(files: list) -> float:
+    """Integrated loudness of a whole folder measured as one continuous program
+    (EBU R128 over all tracks concatenated) — the basis for a single album gain."""
+    if len(files) == 1:
+        return measure_lufs(files[0])
+    inputs = []
+    pre = []
+    for i, f in enumerate(files):
+        inputs += ["-i", f]
+        # Unify rate/layout so concat accepts mixed formats inside one folder
+        pre.append(f"[{i}:a]aformat=sample_rates=48000:channel_layouts=stereo[a{i}]")
+    chain = "".join(f"[a{i}]" for i in range(len(files)))
+    filter_complex = (
+        ";".join(pre)
+        + f";{chain}concat=n={len(files)}:v=0:a=1[c];[c]ebur128=peak=true[out]"
+    )
+    result = subprocess.run(
+        ["ffmpeg", *inputs, "-filter_complex", filter_complex,
+         "-map", "[out]", "-f", "null", "-"],
+        capture_output=True, text=True
+    )
+    lufs = _parse_integrated_lufs(result.stderr)
+    if lufs is None:
+        raise RuntimeError(result.stderr[-300:] or "Could not measure album loudness")
+    return lufs
 
 
 CODEC_MAP = {
@@ -136,31 +170,62 @@ def backup_file(filepath: str) -> str:
 
 class ApplyWorker(QThread):
     progress = pyqtSignal(int, str)
+    status = pyqtSignal(str)
     done = pyqtSignal()
 
-    def __init__(self, files, lufs_values, target, do_backup):
+    def __init__(self, files, lufs_values, target, do_backup, album_mode=False):
         super().__init__()
         self.files = files
         self.lufs_values = lufs_values
         self.target = target
         self.do_backup = do_backup
+        self.album_mode = album_mode
 
     def run(self):
-        for i, (f, lufs) in enumerate(zip(self.files, self.lufs_values)):
+        if self.album_mode:
+            self._run_album()
+        else:
+            self._run_track()
+        self.done.emit()
+
+    def _apply_one(self, i, gain, suffix=""):
+        try:
+            if self.do_backup:
+                backup_file(self.files[i])
+            apply_gain_direct(self.files[i], gain)
+            self.progress.emit(i, f"{gain:+.1f} dB ✓{suffix}")
+        except Exception as e:
+            self.progress.emit(i, f"error: {e}")
+
+    def _run_track(self):
+        for i, lufs in enumerate(self.lufs_values):
             if lufs is None:
                 continue
+            gain = self.target - lufs
+            if abs(gain) < 0.5:
+                self.progress.emit(i, "skipped ✓")
+                continue
+            self._apply_one(i, gain)
+
+    def _run_album(self):
+        groups = {}
+        for i, f in enumerate(self.files):
+            groups.setdefault(str(Path(f).parent), []).append(i)
+        for folder, idxs in groups.items():
             try:
-                gain = self.target - lufs
-                if abs(gain) < 0.5:
-                    self.progress.emit(i, "skipped ✓")
-                    continue
-                if self.do_backup:
-                    backup_file(f)
-                apply_gain_direct(f, gain)
-                self.progress.emit(i, f"{gain:+.1f} dB ✓")
+                self.status.emit(f"Measuring album: {Path(folder).name}")
+                album_lufs = measure_album_lufs([self.files[i] for i in idxs])
             except Exception as e:
-                self.progress.emit(i, f"error: {e}")
-        self.done.emit()
+                for i in idxs:
+                    self.progress.emit(i, f"error: {e}")
+                continue
+            gain = self.target - album_lufs
+            if abs(gain) < 0.5:
+                for i in idxs:
+                    self.progress.emit(i, "skipped ✓ (album)")
+                continue
+            for i in idxs:
+                self._apply_one(i, gain, suffix=" (album)")
 
 
 class DropArea(QWidget):
@@ -252,12 +317,18 @@ class MainWindow(QMainWindow):
         self.btn_apply.setEnabled(False)
         self.btn_apply.setStyleSheet("QPushButton { background: #c94b0a; color: white; } QPushButton:hover { background: #e05510; color: white; }")
 
+        self.chk_album = QCheckBox("Album gain (per folder)")
+        self.chk_album.setToolTip(
+            "One shared gain per folder, measured across the whole album (EBU R128).\n"
+            "Preserves the loudness differences between tracks. Each folder is its own album."
+        )
+
         self.chk_backup = QCheckBox("Backup originals")
         self.chk_backup.setChecked(True)
         self.chk_backup.setToolTip("Copies originals to 'Ohmega Backup/' subfolder before modifying")
 
         for w in [self.btn_add, self.btn_clear, self.target_combo, self.custom_lufs_spin,
-                  self.btn_scan, self.chk_backup, self.btn_apply]:
+                  self.btn_scan, self.chk_album, self.chk_backup, self.btn_apply]:
             ctrl.addWidget(w)
         layout.addLayout(ctrl)
 
@@ -418,15 +489,21 @@ class MainWindow(QMainWindow):
         self.progress.setVisible(True)
         self.progress.setMaximum(len(self.files))
         self.progress.setValue(0)
+        self._apply_done_count = 0
 
-        self.apply_worker = ApplyWorker(self.files, self.lufs_values, target, self.chk_backup.isChecked())
+        self.apply_worker = ApplyWorker(
+            self.files, self.lufs_values, target,
+            self.chk_backup.isChecked(), self.chk_album.isChecked()
+        )
         self.apply_worker.progress.connect(self._on_apply_progress)
+        self.apply_worker.status.connect(self.status.setText)
         self.apply_worker.done.connect(self._on_apply_done)
         self.apply_worker.start()
 
     def _on_apply_progress(self, row, result):
-        self.progress.setValue(row + 1)
-        self.status.setText(f"Processing {row + 1}/{len(self.files)}: {Path(self.files[row]).name}")
+        self._apply_done_count += 1
+        self.progress.setValue(self._apply_done_count)
+        self.status.setText(f"Processing {self._apply_done_count}/{len(self.files)}: {Path(self.files[row]).name}")
         item = QTableWidgetItem(result)
         if result.startswith("skipped"):
             item.setForeground(QColor("#888888"))
@@ -465,6 +542,7 @@ class MainWindow(QMainWindow):
             self.target_combo.setCurrentText("Custom")
             self.custom_lufs_spin.setValue(p.get("custom_lufs", -16.0))
         self.chk_backup.setChecked(p.get("backup", True))
+        self.chk_album.setChecked(p.get("album", False))
 
     def _save_profile(self):
         current_name = self.profile_combo.currentText()
@@ -481,6 +559,7 @@ class MainWindow(QMainWindow):
             "target_label": label,
             "custom_lufs": self.custom_lufs_spin.value(),
             "backup": self.chk_backup.isChecked(),
+            "album": self.chk_album.isChecked(),
         }
         save_profiles(self._profiles)
         self._refresh_profile_combo(select=name)

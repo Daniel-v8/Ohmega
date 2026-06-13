@@ -10,6 +10,7 @@ Normalize audio loudness for FLAC, MP3, WAV, OGG, OPUS, M4A and more — directl
 - Automatic backup of originals before modifying
 - Supports lossless (FLAC, WAV, AIFF, APE, WavPack) and lossy formats (MP3, OGG, OPUS, M4A, AAC, WMA)
 - Three loudness targets: Streaming (−14 LUFS), ReplayGain (−18 LUFS), CD/Mastering (−23 LUFS)
+- Album gain — one shared gain per folder, keeping the loudness balance between tracks intact (EBU R128 album mode, works across multiple folders at once)
 
 ## Requirements
 

@@ -1,5 +1,5 @@
 pkgname=ohmega
-pkgver=1.1.1
+pkgver=1.2.0
 pkgrel=1
 pkgdesc=Ohmega normalizes the loudness of your audio files using the EBU R128 standard.
 arch=('any')

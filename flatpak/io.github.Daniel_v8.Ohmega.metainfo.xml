@@ -15,6 +15,7 @@
     <p>Features:</p>
     <ul>
       <li>Drag and drop files or entire folders</li>
+      <li>Album gain — one shared gain per folder, preserving the loudness balance between tracks (works across multiple folders at once)</li>
       <li>Supports FLAC, WAV, MP3, OGG, OPUS, M4A, AAC, WMA, APE, WavPack</li>
       <li>Lossless processing for FLAC, WAV, AIFF, APE and WavPack</li>
       <li>Automatic backup of originals before modifying</li>
@@ -72,6 +73,11 @@
   </screenshots>
 
   <releases>
+    <release version="1.2.0" date="2026-06-13">
+      <description>
+        <p>Added album gain: each folder is treated as one album, so a single shared gain is measured across all its tracks and the loudness balance between songs stays intact. Works across multiple folders at once.</p>
+      </description>
+    </release>
     <release version="1.1.1" date="2026-05-17">
       <description>
         <p>Fixed backup failing for files opened via drag and drop in Flatpak (portal paths)</p>
