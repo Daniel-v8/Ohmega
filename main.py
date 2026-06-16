@@ -9,20 +9,16 @@ from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QFileDialog, QTableWidget, QTableWidgetItem,
     QProgressBar, QHeaderView, QAbstractItemView, QComboBox, QCheckBox,
-    QDoubleSpinBox, QInputDialog,
+    QDoubleSpinBox, QInputDialog, QListView, QTreeView,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QEvent
 from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QColor, QIcon
 
-from mutagen.flac import FLAC
-from mutagen.mp3 import MP3
-from mutagen.id3 import ID3, TXXX
-
-TARGETS = {
-    "Streaming (-14 LUFS)": -14.0,
-    "ReplayGain 2.0 (-18 LUFS)": -18.0,
-    "Broadcast / Film (-23 LUFS)": -23.0,
-}
+from ohmega_core import (
+    TARGETS, SUPPORTED_EXTENSIONS, LOSSLESS_EXTENSIONS,
+    measure_lufs, measure_album_lufs, apply_gain_direct, backup_file,
+    collect_audio_files,
+)
 
 ICON_PATH = str(Path(__file__).parent / "ohmega.png")
 PROFILES_PATH = Path.home() / ".config" / "ohmega" / "profiles.json"
@@ -40,99 +36,6 @@ def load_profiles() -> dict:
 def save_profiles(profiles: dict):
     PROFILES_PATH.parent.mkdir(parents=True, exist_ok=True)
     PROFILES_PATH.write_text(json.dumps(profiles, indent=2))
-
-
-def _parse_integrated_lufs(stderr: str):
-    for line in reversed(stderr.splitlines()):
-        if "I:" in line and "LUFS" in line:
-            parts = line.split()
-            for i, p in enumerate(parts):
-                if p == "I:":
-                    return float(parts[i + 1])
-    return None
-
-
-def measure_lufs(filepath: str) -> float:
-    result = subprocess.run(
-        ["ffmpeg", "-i", filepath, "-af", "ebur128=peak=true", "-f", "null", "-"],
-        capture_output=True, text=True
-    )
-    lufs = _parse_integrated_lufs(result.stderr)
-    if lufs is None:
-        raise ValueError(f"Could not measure loudness: {filepath}")
-    return lufs
-
-
-def measure_album_lufs(files: list) -> float:
-    """Integrated loudness of a whole folder measured as one continuous program
-    (EBU R128 over all tracks concatenated) — the basis for a single album gain."""
-    if len(files) == 1:
-        return measure_lufs(files[0])
-    inputs = []
-    pre = []
-    for i, f in enumerate(files):
-        inputs += ["-i", f]
-        # Unify rate/layout so concat accepts mixed formats inside one folder
-        pre.append(f"[{i}:a]aformat=sample_rates=48000:channel_layouts=stereo[a{i}]")
-    chain = "".join(f"[a{i}]" for i in range(len(files)))
-    filter_complex = (
-        ";".join(pre)
-        + f";{chain}concat=n={len(files)}:v=0:a=1[c];[c]ebur128=peak=true[out]"
-    )
-    result = subprocess.run(
-        ["ffmpeg", *inputs, "-filter_complex", filter_complex,
-         "-map", "[out]", "-f", "null", "-"],
-        capture_output=True, text=True
-    )
-    lufs = _parse_integrated_lufs(result.stderr)
-    if lufs is None:
-        raise RuntimeError(result.stderr[-300:] or "Could not measure album loudness")
-    return lufs
-
-
-CODEC_MAP = {
-    # Lossless — audio data reencoded losslessly
-    ".flac": ["-c:a", "flac", "-compression_level", "8"],
-    ".wav":  ["-c:a", "pcm_s24le"],
-    ".aiff": ["-c:a", "pcm_s24be"],
-    ".aif":  ["-c:a", "pcm_s24be"],
-    ".ape":  ["-c:a", "ape"],
-    ".wv":   ["-c:a", "wavpack"],
-    # Lossy — small quality loss on re-encode
-    ".mp3":  ["-c:a", "libmp3lame", "-q:a", "0"],
-    ".ogg":  ["-c:a", "libvorbis", "-q:a", "10"],
-    ".opus": ["-c:a", "libopus", "-b:a", "320k"],
-    ".m4a":  ["-c:a", "aac", "-b:a", "320k"],
-    ".aac":  ["-c:a", "aac", "-b:a", "320k"],
-    ".wma":  ["-c:a", "wmav2", "-b:a", "320k"],
-    ".mpc":  ["-c:a", "libmp3lame", "-q:a", "0"],  # transcode to mp3
-}
-
-SUPPORTED_EXTENSIONS = tuple(CODEC_MAP.keys())
-
-LOSSLESS_EXTENSIONS = {".flac", ".wav", ".aiff", ".aif", ".ape", ".wv"}
-
-
-def apply_gain_direct(filepath: str, gain: float):
-    p = Path(filepath)
-    tmp = p.with_suffix(".ohmega_tmp" + p.suffix)
-    ext = p.suffix.lower()
-    codec = CODEC_MAP.get(ext)
-    if codec is None:
-        raise ValueError(f"Unsupported format: {ext}")
-
-    result = subprocess.run(
-        ["ffmpeg", "-y", "-i", filepath,
-         "-af", f"volume={gain}dB",
-         "-map_metadata", "0",
-         *codec, str(tmp)],
-        capture_output=True
-    )
-    if result.returncode != 0:
-        if tmp.exists():
-            tmp.unlink()
-        raise RuntimeError(result.stderr.decode()[-300:])
-    tmp.replace(p)
 
 
 class ScanWorker(QThread):
@@ -153,64 +56,31 @@ class ScanWorker(QThread):
         self.done.emit()
 
 
-def backup_file(filepath: str) -> str:
-    p = Path(filepath)
-    # Flatpak document portal paths (/run/user/…) are read-only dirs — back up to ~/Ohmega Backup instead
-    if str(p).startswith("/run/user/"):
-        backup_dir = Path.home() / "Ohmega Backup"
-    else:
-        backup_dir = p.parent / "Ohmega Backup"
-    backup_dir.mkdir(exist_ok=True)
-    dest = backup_dir / p.name
-    if not dest.exists():
-        import shutil
-        shutil.copy2(filepath, dest)
-    return str(backup_dir)
-
-
 class ApplyWorker(QThread):
     progress = pyqtSignal(int, str)
     status = pyqtSignal(str)
     done = pyqtSignal()
 
-    def __init__(self, files, lufs_values, target, do_backup, album_mode=False):
+    def __init__(self, files, lufs_values, album_keys, target, do_backup):
         super().__init__()
         self.files = files
         self.lufs_values = lufs_values
+        self.album_keys = album_keys
         self.target = target
         self.do_backup = do_backup
-        self.album_mode = album_mode
 
     def run(self):
-        if self.album_mode:
-            self._run_album()
-        else:
-            self._run_track()
-        self.done.emit()
-
-    def _apply_one(self, i, gain, suffix=""):
-        try:
-            if self.do_backup:
-                backup_file(self.files[i])
-            apply_gain_direct(self.files[i], gain)
-            self.progress.emit(i, f"{gain:+.1f} dB ✓{suffix}")
-        except Exception as e:
-            self.progress.emit(i, f"error: {e}")
-
-    def _run_track(self):
-        for i, lufs in enumerate(self.lufs_values):
-            if lufs is None:
-                continue
-            gain = self.target - lufs
-            if abs(gain) < 0.5:
-                self.progress.emit(i, "skipped ✓")
-                continue
-            self._apply_one(i, gain)
-
-    def _run_album(self):
+        # Files added as part of a folder share an album key and get one shared
+        # gain (loudness balance between tracks preserved); loose files added
+        # individually (album key None) are normalized per track.
         groups = {}
-        for i, f in enumerate(self.files):
-            groups.setdefault(str(Path(f).parent), []).append(i)
+        for i, key in enumerate(self.album_keys):
+            if key is not None:
+                groups.setdefault(key, []).append(i)
+        grouped = set()
+        for idxs in groups.values():
+            grouped.update(idxs)
+
         for folder, idxs in groups.items():
             try:
                 self.status.emit(f"Measuring album: {Path(folder).name}")
@@ -227,16 +97,36 @@ class ApplyWorker(QThread):
             for i in idxs:
                 self._apply_one(i, gain, suffix=" (album)")
 
+        for i, lufs in enumerate(self.lufs_values):
+            if i in grouped or lufs is None:
+                continue
+            gain = self.target - lufs
+            if abs(gain) < 0.5:
+                self.progress.emit(i, "skipped ✓")
+                continue
+            self._apply_one(i, gain)
+
+        self.done.emit()
+
+    def _apply_one(self, i, gain, suffix=""):
+        try:
+            if self.do_backup:
+                backup_file(self.files[i])
+            apply_gain_direct(self.files[i], gain)
+            self.progress.emit(i, f"{gain:+.1f} dB ✓{suffix}")
+        except Exception as e:
+            self.progress.emit(i, f"error: {e}")
+
 
 class DropArea(QWidget):
-    files_dropped = pyqtSignal(list)
+    entries_dropped = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
         self.setMinimumHeight(80)
         layout = QVBoxLayout(self)
-        label = QLabel("Drop audio files or a folder here  •  FLAC · WAV · MP3 · OGG · OPUS · M4A · AAC · WMA · APE · WV")
+        label = QLabel("Drop files or folders here — a folder is one album  •  FLAC · WAV · MP3 · OGG · OPUS · M4A · AAC · WMA · APE · WV")
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label.setStyleSheet("color: #888; font-size: 13px;")
         layout.addWidget(label)
@@ -255,18 +145,18 @@ class DropArea(QWidget):
             e.ignore()
 
     def dropEvent(self, e: QDropEvent):
-        files = []
+        # Each entry is (path, album_key): a dropped folder becomes one album
+        # per parent directory; loose files stay per-track (album_key None).
+        entries = []
         for url in e.mimeData().urls():
             path = url.toLocalFile()
             if os.path.isdir(path):
-                for root, _, fnames in os.walk(path):
-                    for fn in fnames:
-                        if fn.lower().endswith(SUPPORTED_EXTENSIONS):
-                            files.append(os.path.join(root, fn))
+                for f in collect_audio_files(path):
+                    entries.append((f, str(Path(f).parent)))
             elif path.lower().endswith(SUPPORTED_EXTENSIONS):
-                files.append(path)
-        if files:
-            self.files_dropped.emit(files)
+                entries.append((path, None))
+        if entries:
+            self.entries_dropped.emit(entries)
 
 
 class MainWindow(QMainWindow):
@@ -277,6 +167,7 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon(ICON_PATH))
         self.files = []
         self.lufs_values = []
+        self.album_keys = []
         self._profiles = load_profiles()
 
         central = QWidget()
@@ -286,13 +177,20 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(16, 16, 16, 16)
 
         self.drop_area = DropArea()
-        self.drop_area.files_dropped.connect(self.add_files)
+        self.drop_area.entries_dropped.connect(self.add_entries)
         layout.addWidget(self.drop_area)
 
         # Main controls row
         ctrl = QHBoxLayout()
         self.btn_add = QPushButton("+ Add files")
         self.btn_add.clicked.connect(self.browse_files)
+        self.btn_add_folder = QPushButton("+ Add folder")
+        self.btn_add_folder.setToolTip(
+            "Pick one or more folders in the file browser.\n"
+            "Each folder is normalized as one album — a single shared gain\n"
+            "(EBU R128) that keeps the loudness balance between its tracks."
+        )
+        self.btn_add_folder.clicked.connect(self.browse_folders)
         self.btn_clear = QPushButton("Clear")
         self.btn_clear.clicked.connect(self.clear_files)
 
@@ -317,18 +215,13 @@ class MainWindow(QMainWindow):
         self.btn_apply.setEnabled(False)
         self.btn_apply.setStyleSheet("QPushButton { background: #c94b0a; color: white; } QPushButton:hover { background: #e05510; color: white; }")
 
-        self.chk_album = QCheckBox("Album gain (per folder)")
-        self.chk_album.setToolTip(
-            "One shared gain per folder, measured across the whole album (EBU R128).\n"
-            "Preserves the loudness differences between tracks. Each folder is its own album."
-        )
-
         self.chk_backup = QCheckBox("Backup originals")
         self.chk_backup.setChecked(True)
         self.chk_backup.setToolTip("Copies originals to 'Ohmega Backup/' subfolder before modifying")
 
-        for w in [self.btn_add, self.btn_clear, self.target_combo, self.custom_lufs_spin,
-                  self.btn_scan, self.chk_album, self.chk_backup, self.btn_apply]:
+        for w in [self.btn_add, self.btn_add_folder, self.btn_clear, self.target_combo,
+                  self.custom_lufs_spin, self.btn_scan, self.chk_backup,
+                  self.btn_apply]:
             ctrl.addWidget(w)
         layout.addLayout(ctrl)
 
@@ -393,15 +286,23 @@ class MainWindow(QMainWindow):
     def _on_target_changed(self, text):
         self.custom_lufs_spin.setVisible(text == "Custom")
 
-    def add_files(self, files):
+    def add_entries(self, entries):
+        """entries: list of (path, album_key). album_key is the folder a file
+        belongs to (it gets album gain), or None for a loose per-track file."""
         existing = set(self.files)
-        new = [f for f in files if f not in existing]
-        for f in new:
+        for f, album_key in entries:
+            if f in existing:
+                continue
+            existing.add(f)
             self.files.append(f)
             self.lufs_values.append(None)
+            self.album_keys.append(album_key)
             row = self.table.rowCount()
             self.table.insertRow(row)
-            self.table.setItem(row, 0, QTableWidgetItem(Path(f).name))
+            name_item = QTableWidgetItem(Path(f).name)
+            if album_key:
+                name_item.setToolTip(f"Album: {Path(album_key).name}")
+            self.table.setItem(row, 0, name_item)
             ext = Path(f).suffix.lower()
             fmt_label = Path(f).suffix.upper().lstrip(".")
             fmt_item = QTableWidgetItem(fmt_label)
@@ -412,7 +313,11 @@ class MainWindow(QMainWindow):
             self.table.setItem(row, 2, QTableWidgetItem("—"))
             self.table.setItem(row, 3, QTableWidgetItem("—"))
         self.btn_apply.setEnabled(False)
-        self.status.setText(f"{len(self.files)} file(s) loaded")
+        albums = len({k for k in self.album_keys if k})
+        if albums:
+            self.status.setText(f"{len(self.files)} file(s) loaded — {albums} album(s)")
+        else:
+            self.status.setText(f"{len(self.files)} file(s) loaded")
 
     def browse_files(self):
         paths, _ = QFileDialog.getOpenFileNames(
@@ -420,11 +325,42 @@ class MainWindow(QMainWindow):
             "Audio files (*.flac *.mp3 *.wav *.aiff *.aif *.ogg *.opus *.m4a *.aac *.wma *.ape *.wv *.mpc)"
         )
         if paths:
-            self.add_files(paths)
+            self.add_entries([(p, None) for p in paths])
+
+    def browse_folders(self):
+        # Qt's native directory picker allows only one folder, so use the
+        # non-native dialog and switch its inner views to multi-selection —
+        # lets several albums be added in one go.
+        dialog = QFileDialog(self, "Select folder(s)")
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+        dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
+        dialog.setDirectory(str(Path.home()))
+        list_view = dialog.findChild(QListView, "listView")
+        if list_view:
+            list_view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        tree_view = dialog.findChild(QTreeView)
+        if tree_view:
+            tree_view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        if not dialog.exec():
+            return
+        entries = []
+        for folder in dialog.selectedFiles():
+            if not os.path.isdir(folder):
+                continue
+            # Group by each file's parent dir, so a selected parent that holds
+            # several album subfolders yields one album per subfolder.
+            for f in collect_audio_files(folder):
+                entries.append((f, str(Path(f).parent)))
+        if entries:
+            self.add_entries(entries)
+        else:
+            self.status.setText("No supported audio files in the selected folder(s)")
 
     def clear_files(self):
         self.files.clear()
         self.lufs_values.clear()
+        self.album_keys.clear()
         self.table.setRowCount(0)
         self.btn_apply.setEnabled(False)
         self.status.setText("Add files and click Scan")
@@ -435,6 +371,7 @@ class MainWindow(QMainWindow):
             self.table.removeRow(row)
             del self.files[row]
             del self.lufs_values[row]
+            del self.album_keys[row]
         if not self.files:
             self.btn_apply.setEnabled(False)
             self.status.setText("Add files and click Scan")
@@ -492,8 +429,8 @@ class MainWindow(QMainWindow):
         self._apply_done_count = 0
 
         self.apply_worker = ApplyWorker(
-            self.files, self.lufs_values, target,
-            self.chk_backup.isChecked(), self.chk_album.isChecked()
+            self.files, self.lufs_values, self.album_keys, target,
+            self.chk_backup.isChecked()
         )
         self.apply_worker.progress.connect(self._on_apply_progress)
         self.apply_worker.status.connect(self.status.setText)
@@ -542,7 +479,6 @@ class MainWindow(QMainWindow):
             self.target_combo.setCurrentText("Custom")
             self.custom_lufs_spin.setValue(p.get("custom_lufs", -16.0))
         self.chk_backup.setChecked(p.get("backup", True))
-        self.chk_album.setChecked(p.get("album", False))
 
     def _save_profile(self):
         current_name = self.profile_combo.currentText()
@@ -559,7 +495,6 @@ class MainWindow(QMainWindow):
             "target_label": label,
             "custom_lufs": self.custom_lufs_spin.value(),
             "backup": self.chk_backup.isChecked(),
-            "album": self.chk_album.isChecked(),
         }
         save_profiles(self._profiles)
         self._refresh_profile_combo(select=name)
