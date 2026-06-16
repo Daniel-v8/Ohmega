@@ -326,6 +326,7 @@
     <a href="#features">Features</a>
     <a href="#demo">Demo</a>
     <a href="#install">Install</a>
+    <a href="#cli">CLI</a>
     <a href="https://github.com/Daniel-v8/Ohmega">GitHub</a>
   </div>
 </nav>
@@ -419,6 +420,14 @@
       <h3>Batch Profiles</h3>
       <p>Save your target and backup settings as named profiles. Switch between them instantly — perfect for different workflows or output requirements.</p>
     </div>
+    <div class="feature-card fade-up" style="transition-delay:480ms">
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 17l6-6-6-6"/>
+        <line x1="12" y1="19" x2="20" y2="19"/>
+      </svg></div>
+      <h3>Command Line</h3>
+      <p>Prefer the terminal? <code style="color:#c8a070">ohmega-cli</code> shares the same engine with full parity — targets, album mode, recursive folders, backups and a dry-run preview. Perfect for scripts and batch jobs.</p>
+    </div>
   </div>
 
   <h2 class="section-title fade-up" style="margin-top:4rem">Supported Formats</h2>
@@ -472,6 +481,54 @@
       Requires <a href="https://flatpak.org/setup/" style="color:#e07535">Flatpak</a> and the <a href="https://kde.org/products/plasma/" style="color:#e07535">KDE Platform 6.9</a> runtime. Works on Fedora, Ubuntu, Arch and any Linux distro.
     </p>
   </div>
+</div>
+
+<div class="section" id="cli">
+  <h2 class="section-title fade-up">Command line</h2>
+  <p class="fade-up" style="text-align:center; color:#c8b8a8; max-width:640px; margin:-1rem auto 2rem;">
+    Prefer the terminal? <code style="color:#c8a070">ohmega-cli</code> shares the same engine as the app — only Python and ffmpeg required. Folders are scanned recursively and originals are backed up before any change.
+  </p>
+  <div class="install-steps fade-up">
+    <div class="step">
+      <span class="step-label">Normalize files to the default Streaming target (−14 LUFS)</span>
+      <div class="code-block">
+        <code>ohmega-cli track1.flac track2.mp3</code>
+        <button class="copy-btn" onclick="copyCmd(this, 'ohmega-cli track1.flac track2.mp3')">Copy</button>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-label">Pick a target — streaming · replaygain · broadcast</span>
+      <div class="code-block">
+        <code>ohmega-cli -t broadcast ~/Music</code>
+        <button class="copy-btn" onclick="copyCmd(this, 'ohmega-cli -t broadcast ~/Music')">Copy</button>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-label">Treat each folder as one album — a shared gain across its tracks</span>
+      <div class="code-block">
+        <code>ohmega-cli --album ~/Music/Album1 ~/Music/Album2</code>
+        <button class="copy-btn" onclick="copyCmd(this, 'ohmega-cli --album ~/Music/Album1 ~/Music/Album2')">Copy</button>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-label">Preview the gain without changing anything</span>
+      <div class="code-block">
+        <code>ohmega-cli --dry-run ~/Music</code>
+        <button class="copy-btn" onclick="copyCmd(this, 'ohmega-cli --dry-run ~/Music')">Copy</button>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-label">See every option (custom --lufs, --no-backup, …)</span>
+      <div class="code-block">
+        <code>ohmega-cli --help</code>
+        <button class="copy-btn" onclick="copyCmd(this, 'ohmega-cli --help')">Copy</button>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:1.5rem; color:#c8b8a8; font-size:0.9rem;">
+    The <code style="color:#c8a070">ohmega-cli</code> command ships with the Fedora (COPR) and Arch (AUR) packages. Inside the Flatpak, run it as
+    <code style="color:#c8a070">flatpak run --command=ohmega-cli io.github.Daniel_v8.Ohmega --help</code>.
+  </p>
 </div>
 
 <div class="section" id="demo">
