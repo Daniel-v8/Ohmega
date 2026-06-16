@@ -54,19 +54,13 @@ modules:
         sha256: 0734959955adde095af9a074213a7f73386d1bbbddfc27346b4c0621641a692e
         only-arches: [aarch64]
 
-  - name: python3-mutagen
-    buildsystem: simple
-    build-commands:
-      - pip3 install --no-index --find-links="." --prefix=/app mutagen
-    sources:
-      - type: file
-        url: https://files.pythonhosted.org/packages/b0/7a/620f945b96be1f6ee357d211d5bf74ab1b7fe72a9f1525aafbfe3aee6875/mutagen-1.47.0-py3-none-any.whl
-        sha256: edd96f50c5907a9539d8e5bba7245f62c9f520aef333d13392a79a4f70aca719
-
   - name: ohmega
     buildsystem: simple
     build-commands:
       - install -Dm644 main.py /app/share/loudless/main.py
+      - install -Dm644 ohmega_core.py /app/share/loudless/ohmega_core.py
+      - install -Dm644 cli.py /app/share/loudless/cli.py
+      - install -Dm755 flatpak/ohmega-cli-launch.sh /app/bin/ohmega-cli
       - install -Dm644 ohmega.png /app/share/loudless/ohmega.png
       - install -Dm644 ohmega-512.png /app/share/icons/hicolor/512x512/apps/io.github.Daniel_v8.Ohmega.png
       - install -Dm644 flatpak/io.github.Daniel_v8.Ohmega.desktop /app/share/applications/io.github.Daniel_v8.Ohmega.desktop

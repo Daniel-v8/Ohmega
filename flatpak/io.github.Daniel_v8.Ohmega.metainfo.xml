@@ -73,6 +73,11 @@
   </screenshots>
 
   <releases>
+    <release version="1.3.0" date="2026-06-16">
+      <description>
+        <p>Added a command-line version (ohmega-cli) with full feature parity: loudness targets, custom LUFS, album mode, recursive folders, backups and a dry-run preview. Adding a folder now normalizes it as one album automatically, while loose files stay per-track. Also refreshed the app icon.</p>
+      </description>
+    </release>
     <release version="1.2.0" date="2026-06-13">
       <description>
         <p>Added album gain: each folder is treated as one album, so a single shared gain is measured across all its tracks and the loudness balance between songs stays intact. Works across multiple folders at once.</p>

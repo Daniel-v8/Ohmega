@@ -1,5 +1,5 @@
 Name:           ohmega
-Version:        1.2.0
+Version:        1.3.0
 Release:        1%{?dist}
 Summary:        Normalize audio loudness directly in your files
 License:        GPL-3.0-only
@@ -14,7 +14,6 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  appstream
 
 Requires:       python3-pyqt6
-Requires:       python3-mutagen
 # ffmpeg is in RPM Fusion Free — enable it in your COPR project settings
 Requires:       ffmpeg
 
@@ -31,6 +30,8 @@ Supports: FLAC, WAV, AIFF, APE, WavPack (lossless), MP3, OGG, OPUS, M4A, AAC, WM
 
 %install
 install -Dm644 main.py        %{buildroot}%{_datadir}/ohmega/main.py
+install -Dm644 ohmega_core.py %{buildroot}%{_datadir}/ohmega/ohmega_core.py
+install -Dm644 cli.py         %{buildroot}%{_datadir}/ohmega/cli.py
 install -Dm644 ohmega.png     %{buildroot}%{_datadir}/ohmega/ohmega.png
 install -Dm644 ohmega-512.png %{buildroot}%{_datadir}/pixmaps/ohmega.png
 
@@ -43,6 +44,9 @@ mkdir -p %{buildroot}%{_bindir}
 printf '#!/bin/bash\nexec python3 /usr/share/ohmega/main.py "$@"\n' \
     > %{buildroot}%{_bindir}/ohmega
 chmod 755 %{buildroot}%{_bindir}/ohmega
+printf '#!/bin/bash\nexec python3 /usr/share/ohmega/cli.py "$@"\n' \
+    > %{buildroot}%{_bindir}/ohmega-cli
+chmod 755 %{buildroot}%{_bindir}/ohmega-cli
 
 sed -i 's|^Icon=.*|Icon=ohmega|' \
     %{buildroot}%{_datadir}/applications/ohmega.desktop
@@ -55,12 +59,17 @@ appstreamcli validate --no-net \
 %files
 %doc README.md
 %{_bindir}/ohmega
+%{_bindir}/ohmega-cli
 %{_datadir}/ohmega/
 %{_datadir}/pixmaps/ohmega.png
 %{_datadir}/applications/ohmega.desktop
 %{_datadir}/metainfo/io.github.Daniel_v8.Ohmega.metainfo.xml
 
 %changelog
+* Mon Jun 16 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.3.0-1
+- Add ohmega-cli: a command-line version with full feature parity (targets, custom LUFS, album mode, recursive folders, backup, dry-run)
+- Adding a folder now normalizes it as one album automatically; loose files stay per-track
+
 * Sat Jun 13 2026 Daniel-v8 <dany.rcmodelar@proton.me> - 1.2.0-1
 - Add album gain: one shared gain per folder (EBU R128), preserving the loudness balance between tracks; handles multiple folders at once
 
